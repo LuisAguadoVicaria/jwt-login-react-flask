@@ -1,14 +1,18 @@
 import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, HashRouter } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 
 import { Home } from "./pages/home";
 import { Demo } from "./pages/demo";
 import { Single } from "./pages/single";
-import injectContext from "./store/appContext";
+import { Login } from "./pages/login";
+import { Signup } from "./pages/signup";
+import { Protected } from "./pages/protected";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+
+import injectContext from "./store/appContext";
 
 //create your first component
 const Layout = () => {
@@ -17,29 +21,21 @@ const Layout = () => {
 	const basename = process.env.BASENAME || "";
 
 	return (
-		<div>
-			<BrowserRouter basename={basename}>
-				<ScrollToTop>
-					<Navbar />
-					<Switch>
-						<Route exact path="/">
-							<Home />
-						</Route>
-						<Route exact path="/demo">
-							<Demo />
-						</Route>
-						<Route exact path="/single/:theid">
-							<Single />
-						</Route>
-						<Route>
-							<h1>Not found!</h1>
-						</Route>
-					</Switch>
-					<Footer />
-				</ScrollToTop>
-			</BrowserRouter>
-		</div>
-	);
+    <React.Fragment>
+
+        <ScrollToTop>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+              <Route path="login" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
+            <Route path="protected" element={<Protected />} />
+          </Routes>
+
+          <Footer />
+        </ScrollToTop>
+    </React.Fragment>
+  );
 };
 
 export default injectContext(Layout);

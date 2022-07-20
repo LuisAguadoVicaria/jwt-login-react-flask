@@ -10,7 +10,10 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.email}>'
-
+        
+    def check_password(self, password):
+        return self.password == password
+        
     def serialize(self):
         return {
             "id": self.id,

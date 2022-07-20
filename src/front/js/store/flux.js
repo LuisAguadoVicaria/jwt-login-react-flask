@@ -13,39 +13,95 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			loginResponse: false,
+			signupResponse: false,
+			getResponse: false,
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
+			setToken: (token) => {
+				localStorage.setItem('access_token_jwt', token);
+
+			},
+
+
+			getToken: () => {
+				return localStorage.getItem('access_token_jwt');
+			},
+
+			removeToken: () => {
+				setStore({ loginResponse: false, signupResponse: false });
+				return localStorage.setItem('access_token_jwt', '');
 			},
 
 			getMessage: async () => {
 				try{
 					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
+					const resp = await fetch(process.env.BACKEND_URL + "/api/")
 					const data = await resp.json()
-					setStore({ message: data.message }))
+					setStore({ message: data.message })
 					// don't forget to return something, that is how the async resolves
 					return data
 				}catch(error){
 					console.log("Error loading message from backend", error)
 				}
 			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
+			getProtected: async (token) => {
+				try{
+					// fetching data from the backend
+					const resp = await fetch(process.env.BACKEND_URL + "/api/protected",
+					{
+						method: 'GET', headers: {
+						  'Content-Type': 'application/json',
+						  'Authorization': 'Bearer '+token,
+						} })
+						const data = await resp.json()
+						setStore({ getResponse: data })
+						// don't forget to return something, that is how the async resolves
+						return data
+					
+					// don't forget to return something, that is how the async resolves
+					return data
+				}catch(error){
+					console.log("Error loading message from backend", error)
+				}
+			},
+			sendLogin: async (form) => {
+				try{
+					// fetching data from the backend
+					const resp = await fetch(process.env.BACKEND_URL + "/api/login",
+					{
+						method: 'POST', headers: {
+						  'Content-Type': 'application/json'
+						}, body: JSON.stringify( {email: form.email, password: form.password} )})
+						const data = await resp.json()
+						localStorage.setItem('access_token_jwt', data.token);
+						setStore({ loginResponse: data.message, signupResponse: data.message })
+						// don't forget to return something, that is how the async resolves
+						return data
+					
+					// don't forget to return something, that is how the async resolves
+					return data
+				}catch(error){
+					console.log("Error loading message from backend", error)
+				}
+			},
+			sendSignup: async (form) => {
+				try{
+					// fetching data from the backend
+					const resp = await fetch(process.env.BACKEND_URL + "/api/signup",
+					{
+						method: 'POST', headers: {
+						  'Content-Type': 'application/json'
+						}, body: JSON.stringify( {email: form.email, password: form.password} )})
+						const data = await resp.json()
+						localStorage.setItem('access_token_jwt', data.token);
+						setStore({ signupResponse: data, loginResponse: data.message })
+						// don't forget to return something, that is how the async resolves
+						return data
+				}catch(error){
+					console.log("Error loading message from backend", error)
+				}
 			}
 		}
 	};
